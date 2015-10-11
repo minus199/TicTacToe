@@ -51,7 +51,6 @@ abstract class PlayerBase
         $this->moves[] = $this->currentMove;
         $this->rows[$this->getLastMove()->getMoveToRow()][] = $this->getLastMove()->getMoveToCol();
         $this->cols[$this->getLastMove()->getMoveToCol()][] = $this->getLastMove()->getMoveToRow();
-
         echo $this->getName() . " moved to " . $this->currentMove . PHP_EOL;
 
         unset($this->currnetMove);
@@ -71,11 +70,15 @@ abstract class PlayerBase
 
     final public function winningStatus($numberOfSlotsForWinning)
     {
-        if (count($this->rows) == $numberOfSlotsForWinning)
-            return true;
+        foreach ($this->rows as $row => $cols){
+            if(count($cols) == $numberOfSlotsForWinning)
+                return true;
+        }
 
-        if (count($this->cols) == $numberOfSlotsForWinning)
-            return true;
+        foreach ($this->getCols() as $col => $rows){
+            if(count($rows) == $numberOfSlotsForWinning)
+                return true;
+        }
 
         $w = 1;
         for ($y = 1, $x = $numberOfSlotsForWinning; $y == $numberOfSlotsForWinning, $x == 1; $y++, $x--) {
@@ -85,11 +88,11 @@ abstract class PlayerBase
                 return true;
         }
 
-        $w = 1;
-        for ($i = 1; $i == 3; $i++) {
-            $w += (int)in_array([$i, $i], $this->getMoves());
+        $w = 0;
+        foreach (range(1,3) as $i){
+            $w += (int)in_array([$i, $i], array_map(function($var){ return $var->toArray(); }, $this->getMoves()));
 
-            if ($w == $numberOfSlotsForWinning)
+            if ($w == 3)
                 return true;
         }
 

@@ -9,6 +9,7 @@
 final class HumanPlayer extends PlayerBase{
     protected function _decideNextMove(Board $board)
     {
+        echo "\nChoose your next move\n";
         $currentChosenMove = $this->promptUser();
         while(!$this->valMove($currentChosenMove)){
             echo "\nInvalid move. Try again.\n";

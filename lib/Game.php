@@ -42,6 +42,8 @@ class Game
 
         $totalMovesMade = 0;
         while ($totalMovesMade != $this->getBoard()->getNumberOfSlots()) {
+            echo "\n----Turn: " . ($totalMovesMade + 1) . "----\n";
+
             $this
                 ->getCurrentTurnOwner()
                     ->decideNextMove($this->getBoard())->doMove();
@@ -56,15 +58,15 @@ class Game
             $this->moveTurn();
         }
 
-        return "TIE";  // All slots are full, game over with tie i guess.
+        return null;  // All slots are full, game over with tie i guess.
     }
 
 
     private function checkWinnings(){
-        if ($this->getPlayerOne()->winningStatus($this->getBoard()->getNumberOfSlots()))
+        if ($this->getPlayerOne()->winningStatus($this->getBoard()->getBoardSize()))
             return $this->getPlayerOne();
 
-        if ($this->getPlayerTwo()->winningStatus($this->getBoard()->getNumberOfSlots()))
+        if ($this->getPlayerTwo()->winningStatus($this->getBoard()->getBoardSize()))
             return $this->getPlayerTwo();
 
         return null;

@@ -7,34 +7,41 @@
  */
 
 final class ComputerPlayer extends PlayerBase {
+    private function getPreferredMoves(){
+        return [
+            [[1,1], [2,2], [3,3]],
+            [[1,1], [1,2], [1,3]],
+            [[1,1], [2,1], [3,1]],
+            [[3,1], [3,2], [3,3]]
+        ];
+    }
+
     protected function _decideNextMove(Board $board)
     {
-        if ($this->getCols())
-            foreach ($this->getCols() as $col => $rows){
-                if (count($rows) == ($board->getBoardSize()-1)){
-                    $nextMove = new Move($col, array_diff(range(1, $board->getBoardSize()), $rows));
+        foreach ($this->getCols() as $col => $rows){
+            $nextMove = new Move($col, array_diff(range(1, $board->getBoardSize()), $rows));
+            if ($this->valMove($nextMove)){
+                return $nextMove;
+            }
+        }
 
-                    if (($this->valMove($nextMove)))
-                        return $nextMove;
+        $m = $this->getPreferredMoves();
+        shuffle($m);
+        foreach ($m as $prefMoves) {
+            shuffle($prefMoves);
+            foreach ($prefMoves as $prefMove) {
+                $testMove = new Move($prefMove[0], $prefMove[1]);
+                if (in_array($testMove->toArray(), $board->getAvailableSlots())) {
+                    return $testMove;
                 }
             }
+        }
 
-        if ($this->getRows())
-            foreach ($this->getRows() as $row => $cols){
-                if (count($cols) == ($board->getBoardSize()-1)){
-                    $nextMove = new Move($row, array_diff(range(1, $board->getBoardSize()), $cols));
-                    if (($this->valMove($nextMove)))
-                        return $nextMove;
-                }
-            }
+        $nextMove = new Move(rand(1,$board->getBoardSize()), rand(1,$board->getBoardSize()));
+        while(!$this->valMove($nextMove)){
+            $nextMove = $this->_decideNextMove($board);
+        }
 
-        $slot = (int)round($board->getBoardSize()/2);
-        $nextMove = new Move($slot, $slot);
-        if (($this->valMove($nextMove)))
-            return $nextMove;
-
-        $nextMoveD = $board->getAvailableSlots()[rand(0, count($board->getAvailableSlots())-1)];
-
-        return new Move($nextMoveD[0], $nextMoveD[1]);
+        return $nextMove;
     }
 }
